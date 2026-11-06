@@ -40,7 +40,7 @@ This roadmap follows the approved phase sequence. The approved AgentOps product 
 - Remaining wire-format and operational decisions are identified for resolution before implementation.
 - No SDK instrumentation, ingestion endpoint, migration, or other application functionality is implemented.
 
-## Phase 1 — Backend Foundation (not started)
+## Phase 1 — Backend Foundation (in progress)
 
 ### Objectives
 

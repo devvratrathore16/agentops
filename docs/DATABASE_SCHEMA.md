@@ -6,13 +6,14 @@ This document records conceptual entities and constraints to guide later design.
 
 | Entity | Purpose | Candidate identifiers/relationships |
 | --- | --- | --- |
+| User | Authenticated platform user | User ID; unique normalized email; password hash; full name; active flag; created/updated timestamps |
 | Organization | Tenant boundary and shared ownership scope | Organization ID; owns or scopes memberships and projects |
-| Membership | Associates a user/principal with an organization and its role | Membership ID; references organization and authenticated principal; role policy TBD |
+| OrganizationMember | Associates a user with an organization and role | Membership ID; organization ID; user ID; role (`owner`, `admin`, or `member`); unique organization/user pair |
 | Session | Represents an authenticated session | Session ID and principal/reference; storage and lifecycle depend on the chosen authentication design |
 | Project | Logical scope for settings and telemetry | Project ID; belongs to an organization |
 | Project API key | Authenticates SDK/API access for a project | Key ID and project reference; persist only a non-recoverable verifier/hash, never the plaintext key |
 
-These names describe domain concepts, not a final relational design. Session representation, membership roles, organization/project deletion behavior, and key rotation/revocation policy require approval before migrations.
+Email uniqueness must be enforced after normalization. Password hashes use Argon2id and must never be returned by API responses. A new user's initial organization and owner membership follow the approved onboarding flow. These names describe domain concepts, not a final relational design. Session representation, organization/project deletion behavior, and key rotation/revocation policy require approval before migrations.
 
 ## Future telemetry entities
 
@@ -30,6 +31,7 @@ Telemetry ingestion and persistence are planned for Phase 3; evaluation records 
 - Tenant context must come from the authenticated user/session or validated project API key, not an untrusted payload field.
 - Organization and membership access must constrain project operations. Project API keys must be bound to one project and cannot select another project by payload value.
 - Enforce tenant-aware lookups and authorization consistently in service/query boundaries; add database tests proving cross-organization and cross-project access is denied.
+- Enforce project slug uniqueness within its organization and organization/user membership uniqueness in the database.
 - Telemetry uniqueness should be scoped as documented in `TELEMETRY_CONTRACT.md`: event ID within project, trace ID within project, span ID within trace. Determine database constraints/indexes that preserve those scopes.
 
 ## Timestamp, payload, and storage considerations
